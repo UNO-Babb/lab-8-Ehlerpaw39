@@ -6,56 +6,57 @@
 import random
 
 def makeID(first,last,num):
-  if len(last) < 5:
-    last = last + "x"
+  while len(last) < 5:
+    last += "x"     # Append 'x' until the last name has at least 5 character
 
 
-  last3 = num[-3:]
+  last3 = num[-3:]  #Extract last 3 digits of student ID 
+  return first[0] + last + last3  # Creat user ID
   
-
   
-
-  id = first[0] + last + last3
-  
-  return id
 
 def makeMajorYear(major, year):
-  first3 = major[0:3]
-  year = year.upper()
-  yearAB = ""
-  if year == "FRESHMAN":
-    yearAB = "FR"
-  elif year == "SOPHOMORE":
-    yearAB = "SO"
-  elif year == "JUNIOR":
-    yearAB = "JR"
-  elif year == "SENIOR":
-    yearAB = "SR"
+  first3 = major[:3].upper()    # Standard major abbreviation
+  year = year.upper()   # Ensure year is uppercase
   
-  MajorYear = first3 + "-" + yearAB
-  return MajorYear
+  yearAB = {
+      "FRESHMAN": "FR",
+      "SOPHOMORE":  "SO",
+      "JUNIOR": "JR",
+      "SENIOR": "SR"
+  }.get(year, "UNK")  # Dictionary lookup for abbreviation
+  
+  return first3 + "-" + yearAB
 
   
 
 def main():
 
   #Open the files we will be using
-  inFile = open("names.dat", 'r')
-  outFile = open("StudentList.csv", 'w')
+  inFile = open("names.dat", 'r') # Open input file
+  outFile = open("StudentList.csv", 'w')  # Open output file
 
   #Process each line of the input file and output to the CSV file
   for student in inFile:
-    #student = "Antwan Dougherty AntwanDougherty@yahoo.com 443-13-3556 03/28/1996 Freshman Philosophy"
-    studentData = student.split()
+    studentData = student.strip().split()
+
+    #might need to delete this
+    # if len(studentData) < 8:  # Ensure line has enough elements
+    #     continue # Skip malformed lines
+
     firstName = studentData[0]
     lastName = studentData[1]
-    studentID = studentData[3]
-    year = studentData[5]
-    major = studentData[6]
-    userID = firstName+lastName+studentID
-    majorYear = makeMajorYear(major, year)
+    studentID = studentData[3]  # Exracting ID  (now corrected index)
+    year = studentData[5]  # Year should be the seond last item
+    major = studentData[6] # Major should be the last item
 
-    studentOutput = lastName + "," + firstName + userID + majorYear + "\n"
+
+    userID = makeID(firstName,lastName,studentID) # Generate user ID
+    majorYear = makeMajorYear(major, year)  # Format  major-year
+
+    
+
+    studentOutput = f"{lastName},{firstName},{userID},{majorYear}\n"  # Correct CSV format
     outFile.write(studentOutput)
 
 
